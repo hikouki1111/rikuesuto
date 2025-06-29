@@ -22,14 +22,14 @@ func Test(t *testing.T) {
 
 	req = MustPost(&Config{
 		URL:  webhook,
-		JSON: map[string]interface{}{"content": "hello"},
+		JSON: map[string]interface{}{"content": "hello json"},
 	})
 	s, res = MustDoReadString(client, req)
 	t.Logf("JSON POST (%d): %s", res.StatusCode, s)
 
 	req = MustPost(&Config{
 		URL:    messages,
-		JSON:   map[string]interface{}{"content": "hello"},
+		JSON:   map[string]interface{}{"content": "hello json with header"},
 		Header: map[string][]string{"authorization": {token}},
 	})
 	s, res = MustDoReadString(client, req)
@@ -43,10 +43,17 @@ func Test(t *testing.T) {
 		URL: webhook,
 		Multipart: &MultipartData{
 			Files:    map[string]*os.File{filename: file},
-			Fields:   map[string]io.Reader{"content": strings.NewReader("hello")},
+			Fields:   map[string]io.Reader{"content": strings.NewReader("hello multipart")},
 			Boundary: "END_OF_PART",
 		},
 	})
 	s, res = MustDoReadString(client, req)
 	t.Logf("Multipart POST with Header (%d): %s", res.StatusCode, s)
+
+	req = MustPost(&Config{
+		URL:  webhook,
+		Form: map[string]string{"content": "hello form"},
+	})
+	s, res = MustDoReadString(client, req)
+	t.Logf("Form POST (%d): %s", res.StatusCode, s)
 }
